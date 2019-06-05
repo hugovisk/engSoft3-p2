@@ -1,54 +1,60 @@
 package com.eng3.p2;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.regex.Pattern;
+import java.util.concurrent.*;
 
 
 
 public class Master {
 	
 	public static void main(String[] args) throws IOException {
-		FileInputStream inputStream = null;
-		Scanner sc = null;
-		String filePath = "/home/hugo/Documentos/ADS/4Ciclo/Engsoft3/Prova/p2/p7";
+		
+		String filePath = "/home/hugo/Documentos/ADS/4Ciclo/Engsoft3/Prova/p2/p7";				
+		ArrayList<ArrayList<String>> registers = new ArrayList<>();
 		long t1, t2;
-		String find = "mysql";
+		int numWorkers = 8;
+		
+		ExecutorService tpes = Executors.newCachedThreadPool();
+		
+		Future futures[] = new Future[numWorkers];
+		
 		
 		t1 = System.currentTimeMillis();
-		try {
-			inputStream = new FileInputStream(filePath);
-			sc = new Scanner(inputStream);
-			while (sc.hasNextLine()) {
-				String line = sc.nextLine();
-				List<String> values = new ArrayList<String>();
-		        try (Scanner lineSc = new Scanner(line)) {
-		            while (lineSc.hasNext()) {//Pattern.compile(find)
-//		            	System.out.println(line);
-		                values.add(lineSc.next());
-//		            	lineSc.next();
-		            }
+		
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {			
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				String[] splited = line.split("\\s+");
+				ArrayList<String> values = new ArrayList<String>();
+		        for (String part : splited) {
+		        	values.add(part);		            
 		        }
-//		        System.out.println(values);
-//				 System.out.println(line);
+		        registers.add(values);
 			}
-			if (sc.ioException() != null) {
-				throw sc.ioException();
-			}
-		} finally {
-			if (inputStream != null) {
-				inputStream.close();
-			}
-			if (sc != null) {
-				sc.close();
-			}
-			
-			t2 = System.currentTimeMillis();
-			System.out.println("Elapsed: " + (t2-t1));
-		}	
-	}	
+			br.close();
+		}
+		System.out.println(registers.size());		
+		t2 = System.currentTimeMillis();
+		System.out.println("I/O Elapsed: " + (t2-t1));
+//		t1 = System.currentTimeMillis();
+		int factor = registers.size()/numWorkers;
+        for (int i = 0; i < numWorkers; i++) {
+            futures[i] = tpes.submit(new Worker(i*factor,(i+1)*factor, registers));
+        }
+        
+//        for (int i = 0; i < numWorkers; i++) {
+//        	series += futures[i].get();
+//        }
+//        t2 = System.currentTimeMillis();
+//        
+//        System.out.println("PROCESS Elapsed: " + (t2-t1));
+        
+        tpes.shutdown();
+		
+	}
 }
 
