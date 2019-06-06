@@ -1,12 +1,16 @@
 package com.eng3.p2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>{
 	long t1, t2;
-	private int start, stop;
-	double avgTime, avgMemory, avgCpu;
+	private int start, stop;	
+	double sumCpu, sumCpuTotal, sumMem, sumMemTotal;
+	long sumTime, sumTimeTotal;
+
+
 	ArrayList<ArrayList<String>> toProcess = new ArrayList<>();
 	
 	ArrayList<ArrayList<ArrayList<String>>> all = new ArrayList<>();
@@ -18,6 +22,8 @@ public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>
 	ArrayList<ArrayList<String>> root = new ArrayList<>();
 	ArrayList<ArrayList<String>> stack = new ArrayList<>();
 	ArrayList<ArrayList<String>> ubuntu = new ArrayList<>();
+	ArrayList<ArrayList<String>> avgCpusAndMems = new ArrayList<>();
+	ArrayList<ArrayList<String>> avgTimes = new ArrayList<>();
 	
 	public Worker(int start,int stop, ArrayList<ArrayList<String>> toProcess) {
 		this.start = start;
@@ -56,34 +62,23 @@ public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>
 	            break;
         }
 			
-	}
-//		System.out.println("apache array: " + apache.size());
-//		System.out.println("docker array: " + docker.size());
-//		System.out.println("java array: " + java.size());
-//		System.out.println("mysql array: " + mysql.size());
-//		System.out.println("postgres array: " + postgres.size());
-//		System.out.println("root array: " + root.size());
-//		System.out.println("stack array: " + stack.size());
-//		System.out.println("ubuntu array: " + ubuntu.size());
-//		int soma = apache.size() + docker.size() + java.size() + mysql.size() + postgres.size() + root.size() + stack.size() + ubuntu.size();
-//		System.out.println(soma);
-		all.add(apache);
-		all.add(docker);
-		all.add(java);
-		all.add(mysql);
-		all.add(postgres);
-		all.add(root);
-		all.add(stack);
-		all.add(ubuntu);
-		
-		double sumCpuTotal = 0;
-		double sumMemTotal = 0;
-		long sumTimeTotal = 0;
-//		int termsTotal = 0;
+	}		
+		// agrega as arrays dos usuarios na array final
+		all.addAll(
+			Arrays.asList(
+				apache, docker, java, mysql, postgres, root, stack, ubuntu
+		));
+
+		// inicia a variaveis de soma
+		sumCpuTotal = 0;
+		sumMemTotal = 0;
+		sumTimeTotal = 0;
+
 		for(ArrayList<ArrayList<String>> user : all) {
-			double sumCpu = 0;
-			double sumMem = 0;
-			long sumTime = 0;		
+			// inicia a variaveis de soma
+			sumCpu = 0;
+			sumMem = 0;
+			sumTime = 0;		
 			
 			for(ArrayList<String> data : user) {
 				double valueCpu = Double.parseDouble(data.get(2));
@@ -97,21 +92,41 @@ public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>
 					sumTime += timeInSecs;			
 			}			
 			
-			Averages avg = new Averages(sumCpu, sumMem, sumTime, user.size());
+			Averages avg = new Averages(sumCpu, sumMem, sumTime, user.size(), user.get(0).get(0));
 			
+			// popula listas de media do uso de memoria e cpu
+			avgCpusAndMems.add(avg.userCpuMem());
+			// popula listas de media do tempo
+			avgTimes.add(avg.userTime());				
+			
+			// calcula soma das medias totais de uso de memoria, cpu e tempo
 			sumCpuTotal += avg.getCpu();
 			sumMemTotal += avg.getMem();
-			sumTimeTotal += avg.getTime();
-			
-		}
-		Averages avgTotal = new Averages(sumCpuTotal, sumMemTotal, sumTimeTotal);
-		System.out.println("Total\n avg %CPU: " + avgTotal.getCpu());
-		System.out.println(" avg %MEM: " + avgTotal.getMem());
-		System.out.println(" avg TIME: " + avgTotal.getTime());
+			sumTimeTotal += avg.getTime();			
+		}		
 		
+		Averages avgTotal = new Averages(sumCpuTotal, sumMemTotal, sumTimeTotal);
+		
+		avgCpusAndMems.add(avgTotal.userCpuMem());
+		avgTimes.add(avgTotal.userTime());
+		
+		all.add(avgCpusAndMems);
+		all.add(avgTimes);
+		
+//		System.out.println(all.get(0).get(0));
+//		System.out.println(all.get(1).get(0));
+//		System.out.println(all.get(2).get(0));
+//		System.out.println(all.get(3).get(0));
+//		System.out.println(all.get(4).get(0));
+//		System.out.println(all.get(5).get(0));
+//		System.out.println(all.get(6).get(0));
+//		System.out.println(all.get(7).get(0));		
+//		System.out.println(all.get(8).get(8));
+//		System.out.println(all.get(9).get(8));
 		t2 = System.currentTimeMillis();        
         System.out.println("PROCESS Elapsed: " + (t2-t1));
-		return null;
+		
+        return all;
 	}
 	
 }
