@@ -76,10 +76,15 @@ public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>
 		all.add(stack);
 		all.add(ubuntu);
 		
+		double sumCpuTotal = 0;
+		double sumMemTotal = 0;
+		long sumTimeTotal = 0;
+//		int termsTotal = 0;
 		for(ArrayList<ArrayList<String>> user : all) {
 			double sumCpu = 0;
 			double sumMem = 0;
-			long sumSecs = 0;
+			long sumTime = 0;		
+			
 			for(ArrayList<String> data : user) {
 				double valueCpu = Double.parseDouble(data.get(2));
 				sumCpu += valueCpu;
@@ -89,19 +94,21 @@ public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>
 				
 				String[] timeSplited = data.get(4).split(":");
 					int timeInSecs = Integer.parseInt(timeSplited[0]) * 60 + Integer.parseInt(timeSplited[1]);
-					sumSecs += timeInSecs;			
-			}
-//			System.out.println("USER:" + user.get(0).get(0));
-			String avgCpu = String.format("%.2f", sumCpu/user.size());
-//			System.out.println("avg %CPU: " + avgCpu);
+					sumTime += timeInSecs;			
+			}			
 			
-			String avgMem = String.format("%.2f", sumMem/user.size());
-//			System.out.println("avg %MEM: " + avgMem);
+			Averages avg = new Averages(sumCpu, sumMem, sumTime, user.size());
 			
-			long avgSecs =  sumSecs/user.size();
-//			System.out.println("avg TIME: " + avgSecs+"s");
-//			System.out.println(" ");
+			sumCpuTotal += avg.getCpu();
+			sumMemTotal += avg.getMem();
+			sumTimeTotal += avg.getTime();
+			
 		}
+		Averages avgTotal = new Averages(sumCpuTotal, sumMemTotal, sumTimeTotal);
+		System.out.println("Total\n avg %CPU: " + avgTotal.getCpu());
+		System.out.println(" avg %MEM: " + avgTotal.getMem());
+		System.out.println(" avg TIME: " + avgTotal.getTime());
+		
 		t2 = System.currentTimeMillis();        
         System.out.println("PROCESS Elapsed: " + (t2-t1));
 		return null;

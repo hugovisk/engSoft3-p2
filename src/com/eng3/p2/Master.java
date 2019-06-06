@@ -16,7 +16,7 @@ public class Master {
 		String filePath = "p7";				
 		ArrayList<ArrayList<String>> registers = new ArrayList<>();
 		long t1, t2;
-		int numWorkers = 8;
+		int numWorkers = 1;
 		
 		ExecutorService tpes = Executors.newCachedThreadPool();
 		

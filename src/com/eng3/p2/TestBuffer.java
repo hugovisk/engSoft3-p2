@@ -11,7 +11,7 @@ public class TestBuffer {
 
 	public static void main(String[] args) throws IOException {
 		
-		String filePath = "/home/hugo/Documentos/ADS/4Ciclo/Engsoft3/Prova/p2/p7";
+		String filePath = "p7";
 //		String find = "java";		
 		long t1, t2;
 		ArrayList<ArrayList<ArrayList<String>>> all = new ArrayList<>();
