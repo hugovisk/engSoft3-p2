@@ -13,7 +13,7 @@ public class Master {
 	
 	public static void main(String[] args) throws IOException {
 		
-		String filePath = "/home/hugo/Documentos/ADS/4Ciclo/Engsoft3/Prova/p2/p7";				
+		String filePath = "p7";				
 		ArrayList<ArrayList<String>> registers = new ArrayList<>();
 		long t1, t2;
 		int numWorkers = 8;
