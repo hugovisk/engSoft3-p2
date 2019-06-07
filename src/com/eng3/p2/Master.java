@@ -110,46 +110,49 @@ public class Master {
 					(int) avgTime.get(i).get(1),
 					numWorkers
 				);
-				
-//				avgCpuMem.get(i).set(1, String.format("%.2f", avg.getCpu()));
-//				avgCpuMem.get(i).set(2, String.format("%.2f", avg.getMem()));
-//				avgTime.get(i).set(1, String.format("%.0f", avg.getTime()));
 				registersProcessed.get(8).get(i).set(1, String.format("%.2f", avg.getCpu()));
 				registersProcessed.get(8).get(i).set(2, String.format("%.2f", avg.getMem()));
 				registersProcessed.get(9).get(i).set(1, String.format("%.0f", avg.getTime()));
 			}
 		}
-//        System.out.println(registersProcessed.get(9));
        
 //        t2 = System.currentTimeMillis();
-//        
+     
 //        System.out.println("PROCESS Elapsed: " + (t2-t1));
-//        System.out.println(avgCpuMem);
-//        System.out.println(avgTime);
-        tpes.shutdown();
-        
+
+        tpes.shutdown();        
        
-			IntStream.range(0, 10).forEach(i -> {
-//				//instancia bufferReader e cria nome do arquivo
-        		String fileName;
-        		if (i < 8) {
-        			fileName = registersProcessed.get(i).get(0).get(0);
-        		} else {
-        			fileName = (i == 8) ? "avgCpuAndMem" : "avgTime";
-        		}
-				try {
-					BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));
-					for (ArrayList<String> line : registersProcessed.get(i)) {
-						for (String data : line) {
-				        	bw.write(data + " ");				           
-						}
-			        	 bw.newLine();
+		IntStream.range(0, 10).forEach(i -> {
+    		String fileName;
+    		if (i < 8) {
+    			fileName = registersProcessed.get(i).get(0).get(0);
+    		} else {
+    			fileName = (i == 8) ? "avgCpuAndMem" : "avgTime";
+    		}
+			try {
+				BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));
+				for (ArrayList<String> line : registersProcessed.get(i)) {
+					for (String data : line) {
+			        	bw.write(data + " ");				           
 					}
-					bw.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} 
-			});
+		        	 bw.newLine();
+				}
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
+		});
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter("userPid"));
+			for (ArrayList<String> line : registers) {
+		        bw.write(line.get(0) + " " + line.get(1));
+	        	bw.newLine();
+			}
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
 			
 	}
 }

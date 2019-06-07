@@ -112,20 +112,10 @@ public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>
 		
 		all.add(avgCpusAndMems);
 		all.add(avgTimes);
-		
-//		System.out.println(all.get(0).get(0));
-//		System.out.println(all.get(1).get(0));
-//		System.out.println(all.get(2).get(0));
-//		System.out.println(all.get(3).get(0));
-//		System.out.println(all.get(4).get(0));
-//		System.out.println(all.get(5).get(0));
-//		System.out.println(all.get(6).get(0));
-//		System.out.println(all.get(7).get(0));		
-//		System.out.println(all.get(8).get(8));
-//		System.out.println(all.get(9).get(8));
+
 		t2 = System.currentTimeMillis();        
         System.out.println("PROCESS Elapsed: " + (t2-t1));
-//		return null;
+
         return all;
 	}
 	
