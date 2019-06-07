@@ -25,6 +25,12 @@ public class Averages {
 		this.time = sumTime/8;
 		this.user = "Total";
 	}
+	// media no master
+	public Averages(double sumCpu, double sumMem, int sumTime, int terms) {
+		this.cpu = sumCpu/terms;
+		this.mem = sumMem/terms;
+		this.time = sumTime/terms;
+	}
 
 	public double getCpu() {
 		return cpu;

@@ -81,33 +81,47 @@ public class Master {
 						IntStream.range(0, files.size()).forEach(k -> {
 							double value = (double) avgCpuMem.get(k).get(1) + Double.parseDouble(files.get(k).get(1));
 							double value2 = (double) avgCpuMem.get(k).get(2) + Double.parseDouble(files.get(k).get(2));
-							
+
 							avgCpuMem.get(k).set(1, value);
 							avgCpuMem.get(k).set(2, value2);
 							
 						});
-					} else {
+					} else if (j == 9) {
 						IntStream.range(0, files.size()).forEach(k -> {
 							int value = (int) avgTime.get(k).get(1) + Integer.parseInt(files.get(k).get(1));
-							
 							avgTime.get(k).set(1, value);
 						});
 					}
 					j++;
 				}
+				
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
         }
-        
+        if (numWorkers > 1) {
+			for(int i = 0; i < 9; i++) {
+				Averages avg = new Averages(
+					(double) avgCpuMem.get(i).get(1), 
+					(double) avgCpuMem.get(i).get(2),
+					(int) avgTime.get(i).get(1),
+					numWorkers
+				);
+				
+				avgCpuMem.get(i).set(1, String.format("%.2f", avg.getCpu()));
+				avgCpuMem.get(i).set(2, String.format("%.2f", avg.getMem()));
+				avgTime.get(i).set(1, String.format("%.0f", avg.getTime()));
+			}
+		}
 //        System.out.println(registersProcessed.get(9).size());
-        System.out.println(avgTime);
+       
 //        t2 = System.currentTimeMillis();
 //        
 //        System.out.println("PROCESS Elapsed: " + (t2-t1));
-        
+        System.out.println(avgCpuMem);
+        System.out.println(avgTime);
         tpes.shutdown();
-		
+		 
 	}
 }
 
