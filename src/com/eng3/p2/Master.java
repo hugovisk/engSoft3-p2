@@ -1,7 +1,9 @@
 package com.eng3.p2;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ public class Master {
 		ArrayList<ArrayList> avgCpuMem = new ArrayList<>();
 		ArrayList<ArrayList> avgTime = new ArrayList<>();
 		long t1, t2;
-		int numWorkers = 8;
+		int numWorkers = 1;
 		
 		ExecutorService tpes = Executors.newCachedThreadPool();
 		
@@ -75,9 +77,9 @@ public class Master {
 								}
 							}
 						}
-					} else if (j < 8) {
+					} else if (j < 8) { // passa os registros de cada usuario
 						Stream.of(files).forEach(registersProcessed.get(j)::addAll);
-					} else if (j == 8) {						
+					} else if (j == 8) { // acumula o valor das medias 						
 						IntStream.range(0, files.size()).forEach(k -> {
 							double value = (double) avgCpuMem.get(k).get(1) + Double.parseDouble(files.get(k).get(1));
 							double value2 = (double) avgCpuMem.get(k).get(2) + Double.parseDouble(files.get(k).get(2));
@@ -99,6 +101,7 @@ public class Master {
 				e.printStackTrace();
 			}
         }
+        // calula a media das medias recebidas dos workers
         if (numWorkers > 1) {
 			for(int i = 0; i < 9; i++) {
 				Averages avg = new Averages(
@@ -108,20 +111,46 @@ public class Master {
 					numWorkers
 				);
 				
-				avgCpuMem.get(i).set(1, String.format("%.2f", avg.getCpu()));
-				avgCpuMem.get(i).set(2, String.format("%.2f", avg.getMem()));
-				avgTime.get(i).set(1, String.format("%.0f", avg.getTime()));
+//				avgCpuMem.get(i).set(1, String.format("%.2f", avg.getCpu()));
+//				avgCpuMem.get(i).set(2, String.format("%.2f", avg.getMem()));
+//				avgTime.get(i).set(1, String.format("%.0f", avg.getTime()));
+				registersProcessed.get(8).get(i).set(1, String.format("%.2f", avg.getCpu()));
+				registersProcessed.get(8).get(i).set(2, String.format("%.2f", avg.getMem()));
+				registersProcessed.get(9).get(i).set(1, String.format("%.0f", avg.getTime()));
 			}
 		}
-//        System.out.println(registersProcessed.get(9).size());
+//        System.out.println(registersProcessed.get(9));
        
 //        t2 = System.currentTimeMillis();
 //        
 //        System.out.println("PROCESS Elapsed: " + (t2-t1));
-        System.out.println(avgCpuMem);
-        System.out.println(avgTime);
+//        System.out.println(avgCpuMem);
+//        System.out.println(avgTime);
         tpes.shutdown();
-		 
+        
+       
+			IntStream.range(0, 10).forEach(i -> {
+//				//instancia bufferReader e cria nome do arquivo
+        		String fileName;
+        		if (i < 8) {
+        			fileName = registersProcessed.get(i).get(0).get(0);
+        		} else {
+        			fileName = (i == 8) ? "avgCpuAndMem" : "avgTime";
+        		}
+				try {
+					BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));
+					for (ArrayList<String> line : registersProcessed.get(i)) {
+						for (String data : line) {
+				        	bw.write(data + " ");				           
+						}
+			        	 bw.newLine();
+					}
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} 
+			});
+			
 	}
 }
 
