@@ -25,13 +25,13 @@ public class Master {
 		ArrayList<ArrayList> avgCpuMem = new ArrayList<>();
 		ArrayList<ArrayList> avgTime = new ArrayList<>();
 		long t1, t2;
-		int numWorkers = 1;
+		int numWorkers = 9;
 		
 		ExecutorService tpes = Executors.newCachedThreadPool();
 		
 		Future<ArrayList<ArrayList<ArrayList<String>>>> futures[] = new Future[numWorkers];		
 		
-		t1 = System.currentTimeMillis();
+//		t1 = System.currentTimeMillis();
 		
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {			
 			String line = null;
@@ -45,10 +45,10 @@ public class Master {
 			}
 			br.close();
 		}
-		System.out.println(registers.size());		
-		t2 = System.currentTimeMillis();
-		System.out.println("I/O Elapsed: " + (t2-t1));
-//		t1 = System.currentTimeMillis();
+//		System.out.println(registers.size());		
+//		t2 = System.currentTimeMillis();
+//		System.out.println("I/O Elapsed: " + (t2-t1));
+		t1 = System.currentTimeMillis();
 		int factor = registers.size()/numWorkers;
         for (int i = 0; i < numWorkers; i++) {
             futures[i] = tpes.submit(new Worker(i*factor,(i+1)*factor, registers));
@@ -101,6 +101,8 @@ public class Master {
 				e.printStackTrace();
 			}
         }
+        t2 = System.currentTimeMillis();     
+        System.out.println("PROCESS Elapsed: " + (t2-t1));
         // calula a media das medias recebidas dos workers
         if (numWorkers > 1) {
 			for(int i = 0; i < 9; i++) {
@@ -115,11 +117,7 @@ public class Master {
 				registersProcessed.get(9).get(i).set(1, String.format("%.0f", avg.getTime()));
 			}
 		}
-       
-//        t2 = System.currentTimeMillis();
-     
-//        System.out.println("PROCESS Elapsed: " + (t2-t1));
-
+        
         tpes.shutdown();        
        
 		IntStream.range(0, 10).forEach(i -> {
@@ -153,7 +151,6 @@ public class Master {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
-			
 	}
 }
 

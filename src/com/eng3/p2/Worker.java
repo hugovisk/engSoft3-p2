@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>{
-	long t1, t2;
+//	long t1, t2;
 	private int start, stop;	
 	double sumCpu, sumCpuTotal, sumMem, sumMemTotal;
 	long sumTime, sumTimeTotal;
@@ -33,7 +33,7 @@ public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>
 	
 	@Override
 	public ArrayList<ArrayList<ArrayList<String>>> call() throws Exception {
-		t1 = System.currentTimeMillis();
+//		t1 = System.currentTimeMillis();
 		for (int i=start;i<stop;i++) {        	
         	switch (toProcess.get(i).get(0)) {
         	case "apache":
@@ -93,6 +93,7 @@ public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>
 			}			
 			
 			Averages avg = new Averages(sumCpu, sumMem, sumTime, user.size(), user.get(0).get(0));
+
 			
 			// popula listas de media do uso de memoria e cpu
 			avgCpusAndMems.add(avg.userCpuMem());
@@ -113,8 +114,8 @@ public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>
 		all.add(avgCpusAndMems);
 		all.add(avgTimes);
 
-		t2 = System.currentTimeMillis();        
-        System.out.println("PROCESS Elapsed: " + (t2-t1));
+//		t2 = System.currentTimeMillis();        
+//        System.out.println("PROCESS Elapsed: " + (t2-t1));
 
         return all;
 	}
