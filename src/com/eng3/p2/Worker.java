@@ -125,7 +125,7 @@ public class Worker implements Callable<ArrayList<ArrayList<ArrayList<String>>>>
 //		System.out.println(all.get(9).get(8));
 		t2 = System.currentTimeMillis();        
         System.out.println("PROCESS Elapsed: " + (t2-t1));
-		
+//		return null;
         return all;
 	}
 	

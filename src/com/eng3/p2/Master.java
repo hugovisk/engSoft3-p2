@@ -5,7 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.concurrent.*;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 
@@ -13,15 +16,18 @@ public class Master {
 	
 	public static void main(String[] args) throws IOException {
 		
+		Locale.setDefault(Locale.US); // para formatar ponto flutuante com ponto		
 		String filePath = "p7";				
 		ArrayList<ArrayList<String>> registers = new ArrayList<>();
+		ArrayList<ArrayList<ArrayList<String>>> registersProcessed = new ArrayList<>();
+		ArrayList<ArrayList> avgCpuMem = new ArrayList<>();
+		ArrayList<ArrayList> avgTime = new ArrayList<>();
 		long t1, t2;
-		int numWorkers = 1;
+		int numWorkers = 8;
 		
 		ExecutorService tpes = Executors.newCachedThreadPool();
 		
-		Future futures[] = new Future[numWorkers];
-		
+		Future<ArrayList<ArrayList<ArrayList<String>>>> futures[] = new Future[numWorkers];		
 		
 		t1 = System.currentTimeMillis();
 		
@@ -46,9 +52,56 @@ public class Master {
             futures[i] = tpes.submit(new Worker(i*factor,(i+1)*factor, registers));
         }
         
-//        for (int i = 0; i < numWorkers; i++) {
-//        	series += futures[i].get();
-//        }
+        for (int i = 0; i < numWorkers; i++) {
+
+        	try {
+        		int j = 0;
+				for ( ArrayList<ArrayList<String>> files : futures[i].get()) {
+					if (i == 0) {
+						registersProcessed.add(files);
+						// passa as strings para numeros em uma nova array heterogenea
+						if (j > 7 ) {
+							for(ArrayList<String> data : registersProcessed.get(j)) {
+								ArrayList value = new ArrayList<>();
+								if (j == 8) {
+									value.add(data.get(0));
+									value.add(Double.parseDouble(data.get(1)));
+									value.add(Double.parseDouble(data.get(2)));
+									avgCpuMem.add(value);
+								} else {
+									value.add(data.get(0));
+									value.add(Integer.parseInt(data.get(1)));
+									avgTime.add(value);									
+								}
+							}
+						}
+					} else if (j < 8) {
+						Stream.of(files).forEach(registersProcessed.get(j)::addAll);
+					} else if (j == 8) {						
+						IntStream.range(0, files.size()).forEach(k -> {
+							double value = (double) avgCpuMem.get(k).get(1) + Double.parseDouble(files.get(k).get(1));
+							double value2 = (double) avgCpuMem.get(k).get(2) + Double.parseDouble(files.get(k).get(2));
+							
+							avgCpuMem.get(k).set(1, value);
+							avgCpuMem.get(k).set(2, value2);
+							
+						});
+					} else {
+						IntStream.range(0, files.size()).forEach(k -> {
+							int value = (int) avgTime.get(k).get(1) + Integer.parseInt(files.get(k).get(1));
+							
+							avgTime.get(k).set(1, value);
+						});
+					}
+					j++;
+				}
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+        }
+        
+//        System.out.println(registersProcessed.get(9).size());
+        System.out.println(avgTime);
 //        t2 = System.currentTimeMillis();
 //        
 //        System.out.println("PROCESS Elapsed: " + (t2-t1));
